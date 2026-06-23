@@ -1981,7 +1981,6 @@
  % end
  <div class="lang-switch" role="group" aria-label="{{_('Language')}}">
  <a href="/set-lang/en">EN</a>
- <a href="/set-lang/zh_CN">中文</a>
  </div>
  </header>
  {{!base}}
