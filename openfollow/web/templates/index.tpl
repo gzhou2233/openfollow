@@ -113,27 +113,6 @@
     % )
     % from openfollow.osc.template import PLACEHOLDERS
     % # OSC destinations come first: transmitters/zones reference them.
-    % include('partials/osc_destinations.tpl',
-    %     config=config, saved=False, focus_id="",
-    %     valid_protocols=VALID_OSC_TRANSMITTER_PROTOCOLS,
-    %     valid_framings=VALID_OSC_FRAMINGS)
-    % # Trigger forms need operator's fader/patch alias lists passed
-    % # from route handler (``_osc_binding_form_sources``); keeps
-    % # template declarative without reaching into route module.
-    % include('partials/osc_bindings.tpl',
-    %     config=config, saved=False, focus_id="",
-    %     valid_rates=VALID_OSC_TRANSMITTER_RATES,
-    %     valid_kinds=VALID_TRIGGER_KINDS,
-    %     valid_edges=VALID_TRIGGER_EDGES,
-    %     valid_modifiers=VALID_TRIGGER_MODIFIERS,
-    %     valid_keys=sorted(VALID_KEY_NAMES),
-    %     valid_buttons=button_names,
-    %     valid_midi_types=VALID_MIDI_MESSAGE_TYPES,
-    %     virtual_fader_names=virtual_fader_names,
-    %     midi_patches=midi_patches,
-    %     builtin_templates=osc_system_templates,
-    %     user_templates=osc_user_templates,
-    %     placeholders=sorted(PLACEHOLDERS))
 </div>
 
 <!-- Person Detection -->

@@ -23,13 +23,13 @@
 % _registered_marker_ids = defined('registered_marker_ids') and registered_marker_ids or []
 <div id="osc-bindings-section" class="section {{'saved' if defined('saved') and saved else ''}}" data-fold-key="osc_bindings" data-help="osc_bindings">
  <div class="section-head">
- <h2>{{_('OSC Output')}}</h2>
- <span class="section-note">{{_('Outbound OSC messages – Stream / Hotkey / Controller-button triggers')}}</span>
+ <h2>OSC Output</h2>
+ <span class="section-note">Outbound OSC messages – Stream / Hotkey / Controller-button triggers</span>
  </div>
 
  <div class="osc-bindings-list">
  % if not transmitters:
- <p class="empty-state">{{_('No OSC outputs configured. Use')}} <em>{{_('+ New OSC output')}}</em> {{_('below to create one.')}}</p>
+ <p class="empty-state">No OSC outputs configured. Use <em>+ New OSC output</em> below to create one.</p>
  % end
  % for idx, row in enumerate(transmitters):
  % is_focus = (defined('focus_id') and focus_id == row.id)
@@ -52,7 +52,7 @@
  <span class="osc-binding-drag-handle"
  draggable="true"
  aria-hidden="true"
- title="{{_('Drag to reorder')}}"
+ title="Drag to reorder"
  onpointerdown="event.stopPropagation()"
  onclick="event.preventDefault(); event.stopPropagation();">⋮⋮</span>
  <span class="osc-binding-enabled-dot {{'on' if row.enabled else 'off'}}" aria-label="{{'Enabled' if row.enabled else 'Disabled'}}"></span>
@@ -75,10 +75,10 @@
  % # ``aria-selected`` in sync with ``.active`` on each
  % # click.
  <div class="row-tab-bar osc-binding-tabbar" role="tablist">
- <button type="button" class="row-tab-btn active" data-row-tab="basics-{{row.id}}" role="tab" aria-selected="true" aria-controls="row-tab-basics-{{row.id}}">{{_('Basics')}}</button>
- <button type="button" class="row-tab-btn" data-row-tab="triggers-{{row.id}}" role="tab" aria-selected="false" aria-controls="row-tab-triggers-{{row.id}}">{{_('Trigger')}}</button>
- <button type="button" class="row-tab-btn" data-row-tab="settings-{{row.id}}" role="tab" aria-selected="false" aria-controls="row-tab-settings-{{row.id}}">{{_('Settings')}}</button>
- <button type="button" class="row-tab-btn" data-row-tab="diag-{{row.id}}" role="tab" aria-selected="false" aria-controls="row-tab-diag-{{row.id}}">{{_('Diagnostics')}}</button>
+ <button type="button" class="row-tab-btn active" data-row-tab="basics-{{row.id}}" role="tab" aria-selected="true" aria-controls="row-tab-basics-{{row.id}}">Basics</button>
+ <button type="button" class="row-tab-btn" data-row-tab="triggers-{{row.id}}" role="tab" aria-selected="false" aria-controls="row-tab-triggers-{{row.id}}">Trigger</button>
+ <button type="button" class="row-tab-btn" data-row-tab="settings-{{row.id}}" role="tab" aria-selected="false" aria-controls="row-tab-settings-{{row.id}}">Settings</button>
+ <button type="button" class="row-tab-btn" data-row-tab="diag-{{row.id}}" role="tab" aria-selected="false" aria-controls="row-tab-diag-{{row.id}}">Diagnostics</button>
  </div>
 
  <!-- Basics -->
@@ -93,7 +93,7 @@
  % # all .save-btn if any control has it; blocks
  % # fix-up workflow). Custom data attribute gives
  % # red border via CSS + sync via oscEditorSyncEnabledUnresolved.
- <label>{{_('Enabled')}}</label>
+ <label>Enabled</label>
  % # {{!...}} bypasses Bottle HTML escape (else
  % # inner quotes → &quot;). data-osc-unresolved
  % # (visual-only) + aria-describedby to hidden span
@@ -102,7 +102,7 @@
  <div class="checkbox-wrap"><input type="checkbox" name="enabled" {{'checked' if row.enabled else ''}} {{!'data-osc-unresolved="true"' if has_unresolved else ''}} aria-describedby="enabled-{{row.id}}-unresolved-help"><span id="enabled-{{row.id}}-unresolved-help" class="visually-hidden" aria-live="polite">{{'Will save disabled: this row uses placeholder values that are not resolved yet (no default marker, or an explicit marker reference targets an unregistered marker).' if has_unresolved else ''}}</span></div>
  </div>
  <div class="field">
- <label>{{_('Name')}}</label>
+ <label>Name</label>
  <input type="text" name="name" value="{{row.name}}" maxlength="64">
  </div>
  <div class="field">
@@ -112,8 +112,8 @@
  % # if default-marker placeholder has no satisfying
  % # marker. hx-include pulls hidden osc_message for
  % # cross-field check.
- <label for="marker-id-{{row.id}}">{{_('Default marker')}}</label>
- <input id="marker-id-{{row.id}}" type="number" name="marker_id" value="{{'' if row.marker_id is None else row.marker_id}}" step="1" placeholder="{{_('(none)')}}"
+ <label for="marker-id-{{row.id}}">Default marker</label>
+ <input id="marker-id-{{row.id}}" type="number" name="marker_id" value="{{'' if row.marker_id is None else row.marker_id}}" step="1" placeholder="(none)"
  hx-get="/api/validate/osc_binding/marker_id"
  hx-trigger="blur changed delay:200ms"
  hx-target="#marker-id-{{row.id}}-error"
@@ -137,9 +137,9 @@
  % # labelled "Master" doesn't read as
  % # "Fader 1" here.
  % _faders_for_default = defined('virtual_fader_names') and virtual_fader_names or [(i, 'Fader %d' % i) for i in range(1, 9)]
- <label for="default-fader-{{row.id}}">{{_('Default fader')}}</label>
+ <label for="default-fader-{{row.id}}">Default fader</label>
  <select id="default-fader-{{row.id}}" name="default_fader">
- <option value="" {{'selected' if row.default_fader is None else ''}}>{{_('(none)')}}</option>
+ <option value="" {{'selected' if row.default_fader is None else ''}}>(none)</option>
  % for idx, fader_name in _faders_for_default:
  <option value="{{idx}}" {{'selected' if idx == row.default_fader else ''}}>{{fader_name}}</option>
  % end
@@ -148,15 +148,15 @@
  </div>
  <div class="row">
  <div class="field">
- <label>{{_('Host')}}</label>
+ <label>Host</label>
  <input type="text" name="host" value="{{row.host}}" maxlength="255">
  </div>
  <div class="field">
- <label>{{_('Port')}}</label>
+ <label>Port</label>
  <input type="number" name="port" value="{{row.port}}" min="1" max="65535" step="1">
  </div>
  <div class="field">
- <label>{{_('Protocol')}}</label>
+ <label>Protocol</label>
  % # ``data-osc-protocol-select`` is the JS hook
  % # base.tpl uses to toggle the sibling
  % # ``framing`` field's visibility – TCP shows
@@ -171,7 +171,7 @@
  % # round-trip; hidden by JS in base.tpl for non-TCP.
  % # Initial state inline so field shows on first render.
  <div class="field" data-osc-framing-field {{'style="display:none"' if row.protocol != 'tcp' else ''}}>
- <label>{{_('Framing')}}</label>
+ <label>Framing</label>
  <select name="framing">
  % for f in valid_framings:
  <option value="{{f}}" {{'selected' if f == row.framing else ''}}>{{'SLIP (RFC 1055)' if f == 'slip' else 'Length-prefix (OSC 1.0)'}}</option>
@@ -191,7 +191,7 @@
  <div class="row-tab-panel" id="row-tab-triggers-{{row.id}}" role="tabpanel">
  <div class="row">
  <div class="field">
- <label>{{_('Trigger type')}}</label>
+ <label>Trigger type</label>
  <select name="trigger.type"
  data-osc-trigger-type-select
  hx-get="/section/osc_binding/{{row.id}}/trigger_form"
@@ -228,7 +228,7 @@
  % # contenteditable <div>. Wire accessible name
  % # via aria-labelledby on editor. Bare <label>
  % # (no for=) still works for screen reader.
- <label id="osc-message-{{row.id}}-label">{{_('OSC message')}}</label>
+ <label id="osc-message-{{row.id}}-label">OSC message</label>
  % # data-osc-unresolved-placeholders: JSON-encoded
  % # list of unmet dependencies (server-side).
  % # Pill JS applies data-unresolved="true" for CSS.
@@ -260,7 +260,7 @@
  id="osc-message-{{row.id}}-hidden"
  value="{{message_value}}">
  <span id="osc-message-{{row.id}}-error" class="field-error"></span>
- <span class="field-note">{{_('First token is the OSC address; the rest are arguments. Click a placeholder below to insert it. Add')}} <code>:N</code> {{_('to target a specific marker or fader – e.g.')}} <code>[x:2]</code>, <code>[fader:3]</code> {{_('– and chain')}} <code>.transform</code> {{_('filters:')}} <code>.inv</code>, <code>.frac</code>, <code>.pct</code>, <code>.int:min-max</code>, <code>.scale:min-max</code> {{_('(e.g.')}} <code>[fader.pct]</code>, <code>[markerfader:3.int:0-100]</code>, <code>[fader.scale:-60-12]</code>{{_('). See')}} <strong>{{_('Help (?)')}}</strong> {{_('for the full grammar and more examples.')}} <strong>{{_('Click any pill to edit it.')}}</strong></span>
+ <span class="field-note">First token is the OSC address; the rest are arguments. Click a placeholder below to insert it. Add <code>:N</code> to target a specific marker or fader – e.g. <code>[x:2]</code>, <code>[fader:3]</code> – and chain <code>.transform</code> filters: <code>.inv</code>, <code>.frac</code>, <code>.pct</code>, <code>.int:min-max</code>, <code>.scale:min-max</code> (e.g. <code>[fader.pct]</code>, <code>[markerfader:3.int:0-100]</code>, <code>[fader.scale:-60-12]</code>). See <strong>Help (?)</strong> for the full grammar and more examples. <strong>Click any pill to edit it.</strong></span>
  </div>
  </div>
  <div class="row placeholder-buttons">
@@ -312,42 +312,47 @@
  <!-- Live status panel -->
  <div class="stat-panel diag-card" data-osc-diag-card="status">
  <div class="stat-panel-head">
- <h4 class="stat-panel-title">{{_('Live status')}}</h4>
+ <h4 class="stat-panel-title">Live status</h4>
  <button type="button" class="diag-action"
  data-osc-diag-refresh="status"
  data-row-id="{{row.id}}"
- title="{{_('Refresh')}}">↻</button>
+ title="Refresh">↻</button>
  </div>
  <div class="diag-body" data-osc-diag-status-body="{{row.id}}">
- <p class="modal-empty">{{_('Loading…')}}</p>
+ <p class="modal-empty">Loading…</p>
  </div>
  </div>
 
  <!-- Preview panel -->
  <div class="stat-panel diag-card" data-osc-diag-card="preview">
  <div class="stat-panel-head">
- <h4 class="stat-panel-title">{{_('Preview')}}</h4>
+ <h4 class="stat-panel-title">Preview</h4>
  <button type="button" class="diag-action"
  data-osc-diag-action="preview"
- data-row-id="{{row.id}}">{{_('Refresh')}}</button>
+ data-row-id="{{row.id}}">Refresh</button>
  </div>
- <p class="stat-help">{{_("Render the message that would be sent right now using the current marker position. Doesn\'t fire on the wire.")}}</p>
+ <p class="stat-help">Render the message that would
+ be sent right now using the current marker
+ position. Doesn't fire on the wire.</p>
  <div class="diag-body" data-osc-diag-preview-body="{{row.id}}">
- <p class="modal-empty">{{_('Click')}} <em>{{_('Refresh')}}</em> {{_('to render the message.')}}</p>
+ <p class="modal-empty">Click <em>Refresh</em> to render the message.</p>
  </div>
  </div>
 
  <!-- Test send panel -->
  <div class="stat-panel diag-card" data-osc-diag-card="test">
  <div class="stat-panel-head">
- <h4 class="stat-panel-title">{{_('Test send')}}</h4>
+ <h4 class="stat-panel-title">Test send</h4>
  <button type="button" class="diag-action primary"
  data-osc-diag-action="test"
- data-row-id="{{row.id}}">{{_('Send test packet')}}</button>
+ data-row-id="{{row.id}}">Send test packet</button>
  </div>
- <p class="stat-help">{{_("Force one packet to the configured destination. Bypasses the row\'s Enabled flag so a disabled row can still be probed before flipping it on.")}}</p>
+ <p class="stat-help">Force one packet to the
+ configured destination. Bypasses the row's
+ Enabled flag so a disabled row can still be
+ probed before flipping it on.</p>
  <div class="diag-body" data-osc-diag-test-body="{{row.id}}">
- <p class="modal-empty">{{_('No test packet sent yet.')}}</p>
+ <p class="modal-empty">No test packet sent yet.</p>
  </div>
  </div>
  </div>
@@ -360,7 +365,7 @@
  % # base.tpl. The legacy ``/move`` route stays available
  % # for API/keyboard-shortcut callers.
  <div class="actions osc-binding-actions">
- <button type="submit" class="save-btn">{{_('Save')}}</button>
+ <button type="submit" class="save-btn">Save</button>
  <!-- Per-row Discard button. Restores row from disk.
  data-discard-btn + data-template-deps gate with
  inverted polarity (disabled when clean).
@@ -372,12 +377,12 @@
  data-template-deps='form.osc-binding-form[data-row-id="{{row.id}}"]'
  data-row-id="{{row.id}}"
  disabled
- title="{{_('No unsaved changes.')}}"
+ title="No unsaved changes."
  hx-get="/section/osc_bindings?focus={{row.id}}"
  hx-target='details.osc-binding-row[data-row-id="{{row.id}}"]'
  hx-select='details.osc-binding-row[data-row-id="{{row.id}}"]'
  hx-swap="outerHTML"
- hx-confirm="{{_('Discard unsaved changes to this row?')}}">{{_('Discard')}}</button>
+ hx-confirm="Discard unsaved changes to this row?">Discard</button>
  <!-- Per-row "Save as template…" button. Reads row's
  name + live OSC message (hidden mirror) and POSTs
  to /api/templates/osc_output/save. File lands as
@@ -388,16 +393,16 @@
  data-osc-save-template-btn
  data-template-save
  data-template-deps='form.osc-binding-form[data-row-id="{{row.id}}"]'
- data-row-id="{{row.id}}">{{_('Save as template…')}}</button>
+ data-row-id="{{row.id}}">Save as template…</button>
  <button type="button" class="secondary"
  hx-post="/section/osc_binding/{{row.id}}/duplicate"
  hx-target="#osc-bindings-section"
- hx-swap="outerHTML">{{_('Duplicate')}}</button>
+ hx-swap="outerHTML">Duplicate</button>
  <button type="button" class="danger"
  hx-post="/section/osc_binding/{{row.id}}/delete"
  hx-target="#osc-bindings-section"
  hx-swap="outerHTML"
- hx-confirm="{{_('Delete this OSC output?')}}">{{_('Delete')}}</button>
+ hx-confirm="Delete this OSC output?">Delete</button>
  </div>
  </form>
  </details>
@@ -412,16 +417,16 @@
  hx-target="#osc-bindings-section"
  hx-swap="outerHTML"
  hx-trigger="submit">
- <label class="inline-label" for="osc-bindings-new-template">{{_('Template')}}</label>
+ <label class="inline-label" for="osc-bindings-new-template">Template</label>
  % # The dropdown is grouped via ``<optgroup>`` so the operator
  % # can tell at a glance which entries ship with the repo
  % # (system) vs. ones they (or the install) saved (user).
  % # ``optgroup label`` is unselectable by design – perfect for
  % # the divider semantics requested by ops.
  <select id="osc-bindings-new-template" name="template_id">
- <option value="">{{_('empty')}}</option>
+ <option value="">empty</option>
  % if builtin_templates:
- <optgroup label="{{_('Default Templates')}}">
+ <optgroup label="Default Templates">
  % # Bundled system templates sourced from disk (same
  % # loader as user templates); carry select_value.
  % for tpl in builtin_templates:
@@ -430,7 +435,7 @@
  </optgroup>
  % end
  % if custom_templates:
- <optgroup label="{{_('Custom Templates')}}">
+ <optgroup label="Custom Templates">
  % # Use file-based select_value (file:<filename>), not
  % # envelope id (ids not unique, would leave duplicates
  % # unselectable).
@@ -440,6 +445,6 @@
  </optgroup>
  % end
  </select>
- <button type="submit" class="save-btn">{{_('+ New OSC output')}}</button>
+ <button type="submit" class="save-btn">+ New OSC output</button>
  </form>
 </div>
