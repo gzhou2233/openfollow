@@ -338,10 +338,14 @@ class TestI18NPlugin:
         plugin.setup(app)
         assert SimpleTemplate.defaults["_"] is _template_translate
 
-    def test_setup_auto_discovers_languages(self, tmp_path: Path) -> None:
+    def test_setup_auto_discovers_languages(self, tmp_path: Path, monkeypatch: Any) -> None:
         """setup() discovers .mo files from locale/ at startup."""
-        (tmp_path / "zh_CN" / "LC_MESSAGES").mkdir(parents=True)
-        (tmp_path / "zh_CN" / "LC_MESSAGES" / "openfollow.mo").touch()
+        # Reset global so auto-discovery runs (previous tests may have
+        # populated _AVAILABLE_LANGUAGES via earlier setup() calls).
+        monkeypatch.setattr(i18n, "_AVAILABLE_LANGUAGES", ())
+
+        (tmp_path / "fr" / "LC_MESSAGES").mkdir(parents=True)
+        (tmp_path / "fr" / "LC_MESSAGES" / "openfollow.mo").touch()
 
         saved = i18n._LOCALE_ROOT
         try:
@@ -350,8 +354,8 @@ class TestI18NPlugin:
             plugin = I18NPlugin(domain="openfollow")
             plugin.setup(app)
             assert "en" in plugin._translations
-            assert "zh_CN" in plugin._translations
-            assert plugin._available_languages == ("en", "zh_CN")
+            assert "fr" in plugin._translations
+            assert plugin._available_languages == ("en", "fr")
         finally:
             i18n._LOCALE_ROOT = saved
 
@@ -558,26 +562,23 @@ class TestCookieBehaviour:
 
 
     def test_first_visit_no_cookie(self) -> None:
-        """No Set-Cookie on first visit (no pre-existing cookie)."""
-        plugin = I18NPlugin(domain="openfollow")
+        """First visit sets a lang cookie (no pre-existing cookie)."""
         app = Bottle()
         app.config["use_https"] = False
-        plugin.setup(app)
+        app.install(I18NPlugin(domain="openfollow"))
 
         @app.get("/")
         def index() -> str:
             return "ok"
 
         _body, headers = self._bottle_request(app)
-        # With the plugin registered, first visit now sets a lang cookie.
         assert "Set-Cookie" in headers
 
     def test_bad_cookie_repaired(self) -> None:
         """Stale/forged cookie triggers a repair Set-Cookie."""
-        plugin = I18NPlugin(domain="openfollow")
         app = Bottle()
         app.config["use_https"] = False
-        plugin.setup(app)
+        app.install(I18NPlugin(domain="openfollow"))
 
         @app.get("/")
         def index() -> str:
@@ -593,9 +594,8 @@ class TestCookieBehaviour:
         Uses raw WSGI to capture the actual Set-Cookie header from a
         plugin-wrapped handler.  Validates real output, not internal state."""
         assert "secure" not in i18n._COOKIE_OPTS
-        plugin = I18NPlugin(domain="openfollow")
         app = Bottle()
-        plugin.setup(app)
+        app.install(I18NPlugin(domain="openfollow"))
 
         @app.get("/")
         def index() -> str:
