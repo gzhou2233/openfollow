@@ -35,7 +35,7 @@ import gettext
 import logging
 from contextvars import ContextVar
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from bottle import SimpleTemplate, request, response
 
@@ -47,6 +47,16 @@ logger = logging.getLogger(__name__)
 # per-request translator.
 SimpleTemplate.defaults.setdefault("_", lambda x: x)
 
+# Locale catalogues live at the repository root under ``locale/<lang>/…``.
+# The path is resolved relative to *this module* (three levels up:
+# ``openfollow/i18n/__init__.py`` → repo root → ``locale/``).  That holds for a
+# source checkout and for the Debian appliance image, where the tree is
+# installed intact.  A packaged install that flattens the layout (wheel,
+# PyInstaller, ``pip install`` of just the package) will NOT find ``locale/``
+# here.  A distributor bundling their own ``.mo`` should either place it at the
+# same relative path or override ``_LOCALE_ROOT`` before ``I18NPlugin.setup()``
+# runs; with no catalogue found the framework falls back to untranslated
+# English rather than failing.
 _LOCALE_ROOT = Path(__file__).resolve().parent.parent.parent / "locale"
 
 _translate_ctx: ContextVar[Any] = ContextVar("i18n_translate", default=None)
@@ -85,7 +95,20 @@ def _template_translate(message: str) -> str:
 # and avoids the trap of matching by translated text which changes at
 # runtime.  Calling code that needs a translated comparison can call
 # ``str()`` on both sides first.
-class _LazyString:
+#
+# Typing note: at runtime ``_LazyString`` is a standalone transparent ``str``
+# proxy (it can't subclass the immutable ``str`` and still defer resolution).
+# For static typing we declare it *as* a ``str`` subclass so it is
+# substitutable everywhere a ``str`` is expected (e.g. a plugin's
+# ``display_name``) without leaking the proxy type into every consumer.  This
+# is the standard lazy-string idiom (cf. Django's ``lazy``).
+if TYPE_CHECKING:
+    _LazyStringBase = str
+else:
+    _LazyStringBase = object
+
+
+class _LazyString(_LazyStringBase):
     __slots__ = ("_message",)
 
     def __init__(self, message: str) -> None:
@@ -116,6 +139,29 @@ class _LazyString:
     def __radd__(self, other: object) -> str:
         return str(other) + str(self)
 
+    # Transparent string proxy: forward everything else (``.lower()``,
+    # ``.strip()``, ``.split()`` …) to the resolved string.  Class-level
+    # attributes like a plugin's ``display_name`` are declared as ``_l(...)``
+    # but consumed as plain ``str`` (sorted, lower-cased, f-string'd), so the
+    # proxy must behave like ``str`` for every operation — not just the dunder
+    # handful above.  ``__eq__``/``__hash__``/``__mod__``/``__add__`` stay
+    # overridden on purpose (msgid-based equality); ``__getattr__`` only fires
+    # for attributes not found on the instance, so it never shadows them.
+    def __getattr__(self, name: str) -> Any:
+        return getattr(str(self), name)
+
+    def __len__(self) -> int:
+        return len(str(self))
+
+    def __getitem__(self, key: Any) -> str:
+        return str(self)[key]
+
+    def __contains__(self, item: object) -> bool:
+        return str(item) in str(self)
+
+    def __iter__(self) -> Any:
+        return iter(str(self))
+
 
 def lazy_gettext(message: str) -> _LazyString:
     """Deferred-translation factory.
@@ -132,7 +178,9 @@ def lazy_gettext(message: str) -> _LazyString:
 
 
 # Convenience aliases
-_l = lazy_gettext   # for class-level (import-time) strings
+_l = lazy_gettext  # for class-level (import-time) strings
+
+
 def _(message: str) -> str:
     """Immediate translation for per-request Python code."""
     return _template_translate(message)
@@ -148,6 +196,7 @@ def validate_language_code(lang: str) -> bool:
     the test suite can share the same validation logic without copy-paste.
     """
     return lang == "en" or lang in _AVAILABLE_LANGUAGES
+
 
 # Framework ships English-only.  Language pack maintainers drop a .mo under
 # locale/<code>/LC_MESSAGES/ — the framework auto-discovers it at startup.
@@ -188,10 +237,10 @@ def _subtag_match(available: str, requested: str) -> bool:
         return True
     if len(available) > len(requested):
         # e.g. available="en_US", requested="en" — check boundary after prefix
-        return available.startswith(requested) and available[len(requested):len(requested)+1] == "_"
+        return available.startswith(requested) and available[len(requested) : len(requested) + 1] == "_"
     else:
         # e.g. available="en", requested="en_US" — check boundary after available
-        return requested.startswith(available) and requested[len(available):len(available)+1] == "_"
+        return requested.startswith(available) and requested[len(available) : len(available) + 1] == "_"
 
 
 def _best_language(accept_lang_header: str | None, available: tuple[str, ...]) -> str:
@@ -275,9 +324,7 @@ class I18NPlugin:
                     fallback=True,
                 )
             except Exception as exc:
-                logger.warning(
-                    "i18n: failed to load translations for %r: %s", lang, exc
-                )
+                logger.warning("i18n: failed to load translations for %r: %s", lang, exc)
                 trans = gettext.NullTranslations()
             self._translations[lang] = trans
 
@@ -312,6 +359,7 @@ class I18NPlugin:
                 return callback(*args, **kwargs)
             finally:
                 _translate_ctx.reset(token)
+
         return wrapper
 
     def close(self) -> None:

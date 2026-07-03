@@ -8,7 +8,6 @@ GStreamer Rust NDI plugin at the SDK.
 """
 
 from __future__ import annotations
-from openfollow.i18n import _, _l  # noqa: E402
 
 import ctypes
 import ctypes.util
@@ -18,6 +17,7 @@ import os
 from collections.abc import Callable
 from typing import Any
 
+from openfollow.i18n import _, _l  # noqa: E402
 from openfollow.video.inputs._base import (
     ConfigField,
     InputCapabilities,

@@ -8,7 +8,7 @@
 % if config.web_pin:
 <div class="top-bar-actions">
     <form method="POST" action="/logout" style="margin:0;">
-        <button type="submit" class="secondary small">Logout</button>
+        <button type="submit" class="secondary small">{{_('Logout')}}</button>
     </form>
 </div>
 % end
@@ -136,7 +136,7 @@
     %     placeholders=sorted(PLACEHOLDERS),
     %     registered_marker_ids=registered_marker_ids,
     %     unresolved_by_row=unresolved_by_row,
-    %     marker_display_by_row=marker_display_by_row) (i18n: refine _() wrapping - remove from internals, add missing user-facing strings)
+    %     marker_display_by_row=marker_display_by_row)
 </div>
 
 <!-- Person Detection -->

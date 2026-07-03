@@ -33,7 +33,7 @@
                        aria-describedby="grid-width-error" aria-invalid="false">
                 <span id="grid-width-error" class="field-error"></span>
                 % if _imp:
-                <small class="metric-echo">Stored: {{metric_echo(config.grid.width)}}</small>
+                <small class="metric-echo">{{_('Stored:')}} {{metric_echo(config.grid.width)}}</small>
                 % end
             </div>
             <div class="field">
@@ -44,7 +44,7 @@
                        aria-describedby="grid-depth-error" aria-invalid="false">
                 <span id="grid-depth-error" class="field-error"></span>
                 % if _imp:
-                <small class="metric-echo">Stored: {{metric_echo(config.grid.depth)}}</small>
+                <small class="metric-echo">{{_('Stored:')}} {{metric_echo(config.grid.depth)}}</small>
                 % end
             </div>
             <div class="field">
@@ -55,7 +55,7 @@
                        aria-describedby="grid-max-height-error" aria-invalid="false">
                 <span id="grid-max-height-error" class="field-error"></span>
                 % if _imp:
-                <small class="metric-echo">Stored: {{metric_echo(config.grid.max_height)}}</small>
+                <small class="metric-echo">{{_('Stored:')}} {{metric_echo(config.grid.max_height)}}</small>
                 % end
             </div>
             <div class="field">
@@ -66,7 +66,7 @@
                        aria-describedby="grid-spacing-error" aria-invalid="false">
                 <span id="grid-spacing-error" class="field-error"></span>
                 % if _imp:
-                <small class="metric-echo">Stored: {{metric_echo(config.grid.spacing)}}</small>
+                <small class="metric-echo">{{_('Stored:')}} {{metric_echo(config.grid.spacing)}}</small>
                 % end
             </div>
         </div>
@@ -82,7 +82,7 @@
                 %# via data-color-picker. Inline validator dropped (see marker.tpl).
                 <button id="grid-color" type="button" class="color-swatch-trigger"
                         data-color-picker="greys" data-value="{{config.grid.color}}"
-                        aria-label="Grid line colour"></button>
+                        aria-label="{{_('Grid line colour')}}"></button>
                 <input type="hidden" name="color" value="{{config.grid.color}}">
             </div>
             <div class="field">
@@ -115,7 +115,7 @@
                        aria-describedby="grid-x-offset-error" aria-invalid="false">
                 <span id="grid-x-offset-error" class="field-error"></span>
                 % if _imp:
-                <small class="metric-echo">Stored: {{metric_echo(config.grid.x_offset)}}</small>
+                <small class="metric-echo">{{_('Stored:')}} {{metric_echo(config.grid.x_offset)}}</small>
                 % end
             </div>
             <div class="field">
@@ -126,7 +126,7 @@
                        aria-describedby="grid-y-offset-error" aria-invalid="false">
                 <span id="grid-y-offset-error" class="field-error"></span>
                 % if _imp:
-                <small class="metric-echo">Stored: {{metric_echo(config.grid.y_offset)}}</small>
+                <small class="metric-echo">{{_('Stored:')}} {{metric_echo(config.grid.y_offset)}}</small>
                 % end
             </div>
             <div class="field">
@@ -137,7 +137,7 @@
                        aria-describedby="grid-z-offset-error" aria-invalid="false">
                 <span id="grid-z-offset-error" class="field-error"></span>
                 % if _imp:
-                <small class="metric-echo">Stored: {{metric_echo(config.grid.z_offset)}}</small>
+                <small class="metric-echo">{{_('Stored:')}} {{metric_echo(config.grid.z_offset)}}</small>
                 % end
             </div>
         </div>
@@ -158,7 +158,7 @@
                        aria-describedby="grid-origin-length-error" aria-invalid="false">
                 <span id="grid-origin-length-error" class="field-error"></span>
                 % if _imp:
-                <small class="metric-echo">Stored: {{metric_echo(config.grid.origin_length)}}</small>
+                <small class="metric-echo">{{_('Stored:')}} {{metric_echo(config.grid.origin_length)}}</small>
                 % end
             </div>
             <div class="field">

@@ -24,12 +24,12 @@
             <div class="field">
                 <label>{{_('Eval Rate (FPS)')}}</label>
                 <select name="eval_fps">
-                    <option value="1" {{'selected' if config.trigger_zones.eval_fps == 1 else ''}}>1 FPS</option>
-                    <option value="5" {{'selected' if config.trigger_zones.eval_fps == 5 else ''}}>5 FPS</option>
-                    <option value="10" {{'selected' if config.trigger_zones.eval_fps == 10 else ''}}>10 FPS</option>
-                    <option value="15" {{'selected' if config.trigger_zones.eval_fps == 15 else ''}}>15 FPS</option>
-                    <option value="30" {{'selected' if config.trigger_zones.eval_fps == 30 else ''}}>30 FPS</option>
-                    <option value="60" {{'selected' if config.trigger_zones.eval_fps == 60 else ''}}>60 FPS</option>
+                    <option value="1" {{'selected' if config.trigger_zones.eval_fps == 1 else ''}}>{{_('1 FPS')}}</option>
+                    <option value="5" {{'selected' if config.trigger_zones.eval_fps == 5 else ''}}>{{_('5 FPS')}}</option>
+                    <option value="10" {{'selected' if config.trigger_zones.eval_fps == 10 else ''}}>{{_('10 FPS')}}</option>
+                    <option value="15" {{'selected' if config.trigger_zones.eval_fps == 15 else ''}}>{{_('15 FPS')}}</option>
+                    <option value="30" {{'selected' if config.trigger_zones.eval_fps == 30 else ''}}>{{_('30 FPS')}}</option>
+                    <option value="60" {{'selected' if config.trigger_zones.eval_fps == 60 else ''}}>{{_('60 FPS')}}</option>
                 </select>
             </div>
             <div class="field">

@@ -301,7 +301,7 @@
       <!-- Camera body -->
       <polygon id="pp-cam-body" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
       <polygon id="pp-cam-lens" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
-      <text id="pp-cam-label" fill="rgba(247,245,233,0.68)" font-size="10" font-weight="600">Camera</text>
+      <text id="pp-cam-label" fill="rgba(247,245,233,0.68)" font-size="10" font-weight="600">{{_('Camera')}}</text>
       <!-- DS / US labels -->
       <text id="pp-ds-label" fill="rgba(247,245,233,0.3)" font-size="9" font-weight="600" text-anchor="middle">DOWNSTAGE</text>
       <text id="pp-us-label" fill="rgba(247,245,233,0.3)" font-size="9" font-weight="600" text-anchor="middle">UPSTAGE</text>
@@ -441,14 +441,14 @@
       <p class="wizard-help">{{_("Define where the Reference Point sits within the grid. By default, it is at the center of the front edge (X Offset = 0, Y Offset = depth / 2).")}}</p>
       <div class="row">
         <div class="field">
-          <label for="grid_x_offset">{{_('X Offset')}} ({{_len}}) <span style="font-weight:400;text-transform:none;letter-spacing:0;">(stage left +)</span></label>
+          <label for="grid_x_offset">{{_('X Offset')}} ({{_len}}) <span style="font-weight:400;text-transform:none;letter-spacing:0;">{{_('(stage left +)')}}</span></label>
           <input type="{{'text' if _imp else 'number'}}"{{!'' if _imp else ' step="0.01"'}} id="grid_x_offset" value="{{format_length(config.grid.x_offset, _us) if _imp else config.grid.x_offset}}" oninput="onGridInputChanged()">
           % if _imp:
           <small class="metric-echo" id="grid_x_offset-echo">{{_('Stored:')}} {{metric_echo(config.grid.x_offset)}}</small>
           % end
         </div>
         <div class="field">
-          <label for="grid_y_offset">{{_('Y Offset')}} ({{_len}}) <span style="font-weight:400;text-transform:none;letter-spacing:0;">(upstage +)</span></label>
+          <label for="grid_y_offset">{{_('Y Offset')}} ({{_len}}) <span style="font-weight:400;text-transform:none;letter-spacing:0;">{{_('(upstage +)')}}</span></label>
           <input type="{{'text' if _imp else 'number'}}"{{!'' if _imp else ' step="0.01"'}} id="grid_y_offset" value="{{format_length(config.grid.y_offset, _us) if _imp else config.grid.y_offset}}" oninput="onGridInputChanged()">
           % if _imp:
           <small class="metric-echo" id="grid_y_offset-echo">{{_('Stored:')}} {{metric_echo(config.grid.y_offset)}}</small>
@@ -546,7 +546,7 @@
       <!-- Camera body (box: lens square + body length) -->
       <polygon id="cp-cam-body" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
       <polygon id="cp-cam-lens" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.5)" stroke-width="1"/>
-      <text id="cp-cam-label" fill="rgba(247,245,233,0.68)" font-size="10" font-weight="600">Camera</text>
+      <text id="cp-cam-label" fill="rgba(247,245,233,0.68)" font-size="10" font-weight="600">{{_('Camera')}}</text>
       <!-- X measurement line (ref to cam floor X) -->
       <line id="cp-x-line" stroke="rgba(255,140,140,0.5)" stroke-width="1.5"/>
       <text id="cp-x-label" fill="rgba(255,140,140,0.8)" font-size="9" font-weight="600"></text>
@@ -576,21 +576,21 @@
       <p class="wizard-help">{{_("Enter the camera physical position relative to the Reference Point, in")}} {{_len}}. {{_("These use PSN theatrical coordinates: X = stage left, Y = upstage, Z = up.")}}</p>
       <div class="row">
         <div class="field">
-          <label for="cam_pos_x">{{_('Pos X')}} ({{_len}}) <span style="font-weight:400;text-transform:none;letter-spacing:0;">(stage left +)</span></label>
+          <label for="cam_pos_x">{{_('Pos X')}} ({{_len}}) <span style="font-weight:400;text-transform:none;letter-spacing:0;">{{_('(stage left +)')}}</span></label>
           <input type="{{'text' if _imp else 'number'}}"{{!'' if _imp else ' step="0.01"'}} id="cam_pos_x" value="{{format_length(config.camera.pos_x, _us) if _imp else config.camera.pos_x}}" oninput="onCamInputChanged()">
           % if _imp:
           <small class="metric-echo" id="cam_pos_x-echo">{{_('Stored:')}} {{metric_echo(config.camera.pos_x)}}</small>
           % end
         </div>
         <div class="field">
-          <label for="cam_pos_y">{{_('Pos Y')}} ({{_len}}) <span style="font-weight:400;text-transform:none;letter-spacing:0;">(upstage +)</span></label>
+          <label for="cam_pos_y">{{_('Pos Y')}} ({{_len}}) <span style="font-weight:400;text-transform:none;letter-spacing:0;">{{_('(upstage +)')}}</span></label>
           <input type="{{'text' if _imp else 'number'}}"{{!'' if _imp else ' step="0.01"'}} id="cam_pos_y" value="{{format_length(config.camera.pos_y, _us) if _imp else config.camera.pos_y}}" oninput="onCamInputChanged()">
           % if _imp:
           <small class="metric-echo" id="cam_pos_y-echo">{{_('Stored:')}} {{metric_echo(config.camera.pos_y)}}</small>
           % end
         </div>
         <div class="field">
-          <label for="cam_pos_z">{{_('Pos Z')}} ({{_len}}) <span style="font-weight:400;text-transform:none;letter-spacing:0;">(height)</span></label>
+          <label for="cam_pos_z">{{_('Pos Z')}} ({{_len}}) <span style="font-weight:400;text-transform:none;letter-spacing:0;">{{_('(height)')}}</span></label>
           <input type="{{'text' if _imp else 'number'}}"{{!'' if _imp else ' step="0.01"'}} id="cam_pos_z" value="{{format_length(config.camera.pos_z, _us) if _imp else config.camera.pos_z}}" oninput="onCamInputChanged()">
           % if _imp:
           <small class="metric-echo" id="cam_pos_z-echo">{{_('Stored:')}} {{metric_echo(config.camera.pos_z)}}</small>
@@ -760,12 +760,12 @@
     <div id="fine-status" class="wizard-status" style="display:none;"></div>
 
     <div id="fine-solved-params" class="wizard-solved-params" style="display:none;">
-      <div class="wizard-solved-param"><span class="param-label">Pos X</span><span class="param-value" id="solved-pos-x">-</span></div>
-      <div class="wizard-solved-param"><span class="param-label">Pos Y</span><span class="param-value" id="solved-pos-y">-</span></div>
-      <div class="wizard-solved-param"><span class="param-label">Pos Z</span><span class="param-value" id="solved-pos-z">-</span></div>
-      <div class="wizard-solved-param"><span class="param-label">Pitch</span><span class="param-value" id="solved-pitch">-</span></div>
-      <div class="wizard-solved-param"><span class="param-label">Yaw</span><span class="param-value" id="solved-yaw">-</span></div>
-      <div class="wizard-solved-param"><span class="param-label">Roll</span><span class="param-value" id="solved-roll">-</span></div>
+      <div class="wizard-solved-param"><span class="param-label">{{_('Pos X')}}</span><span class="param-value" id="solved-pos-x">-</span></div>
+      <div class="wizard-solved-param"><span class="param-label">{{_('Pos Y')}}</span><span class="param-value" id="solved-pos-y">-</span></div>
+      <div class="wizard-solved-param"><span class="param-label">{{_('Pos Z')}}</span><span class="param-value" id="solved-pos-z">-</span></div>
+      <div class="wizard-solved-param"><span class="param-label">{{_('Pitch')}}</span><span class="param-value" id="solved-pitch">-</span></div>
+      <div class="wizard-solved-param"><span class="param-label">{{_('Yaw')}}</span><span class="param-value" id="solved-yaw">-</span></div>
+      <div class="wizard-solved-param"><span class="param-label">{{_('Roll')}}</span><span class="param-value" id="solved-roll">-</span></div>
       <div class="wizard-solved-param"><span class="param-label">FOV</span><span class="param-value" id="solved-fov">-</span></div>
     </div>
 
@@ -781,7 +781,7 @@
 
     <div id="cp-lens-controls" class="experimental-feature" style="margin-top:0.72rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;">
       <div class="field" style="flex:1;min-width:200px;">
-        <label for="cp_lens_k1">{{_('Lens distortion')}} <span class="badge-experimental">Experimental</span> &ndash; barrel / fisheye (k1)</label>
+        <label for="cp_lens_k1">{{_('Lens distortion')}} <span class="badge-experimental">{{_('Experimental')}}</span> &ndash; {{_('barrel / fisheye (k1)')}}</label>
         <div style="display:flex;gap:0.5rem;align-items:center;">
           <input type="range" id="cp_lens_k1_range" min="-0.4" max="0.4" step="0.005"
                  value="{{config.camera.lens_k1}}" style="flex:1;" oninput="onWizardLensRange('k1')"
@@ -801,7 +801,7 @@
         </div>
       </div>
     </div>
-    <p class="wizard-tip experimental-feature" style="margin-top:0.4rem;">Bow the projected grid to match a fisheye / wide-angle lens before pinning the corners. Only the overlay is bent; the video is unchanged.</p>
+    <p class="wizard-tip experimental-feature" style="margin-top:0.4rem;">{{_('Bow the projected grid to match a fisheye / wide-angle lens before pinning the corners. Only the overlay is bent; the video is unchanged.')}}</p>
 
     <p class="wizard-help" style="margin-top:0.72rem;">
       {{_("Drag each corner marker to its physical mark on the stage. The labels are stage positions: DSL/USL are stage left, DSR/USR are stage right (D = downstage/front, U = upstage/back). With a front-of-house camera you see the audience view, so stage left is on the right of the image (audience right) and stage right is on the left (audience left).")}}
@@ -841,12 +841,12 @@
     <div class="group">
       <div class="group-title">{{_("Camera")}}</div>
       <div class="wizard-solved-params" id="review-camera-params">
-        <div class="wizard-solved-param"><span class="param-label">Pos X</span><span class="param-value" id="review-cam-pos-x">-</span></div>
-        <div class="wizard-solved-param"><span class="param-label">Pos Y</span><span class="param-value" id="review-cam-pos-y">-</span></div>
-        <div class="wizard-solved-param"><span class="param-label">Pos Z</span><span class="param-value" id="review-cam-pos-z">-</span></div>
-        <div class="wizard-solved-param"><span class="param-label">Pitch</span><span class="param-value" id="review-cam-pitch">-</span></div>
-        <div class="wizard-solved-param"><span class="param-label">Yaw</span><span class="param-value" id="review-cam-yaw">-</span></div>
-        <div class="wizard-solved-param"><span class="param-label">Roll</span><span class="param-value" id="review-cam-roll">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('Pos X')}}</span><span class="param-value" id="review-cam-pos-x">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('Pos Y')}}</span><span class="param-value" id="review-cam-pos-y">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('Pos Z')}}</span><span class="param-value" id="review-cam-pos-z">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('Pitch')}}</span><span class="param-value" id="review-cam-pitch">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('Yaw')}}</span><span class="param-value" id="review-cam-yaw">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('Roll')}}</span><span class="param-value" id="review-cam-roll">-</span></div>
         <div class="wizard-solved-param"><span class="param-label">FOV</span><span class="param-value" id="review-cam-fov">-</span></div>
       </div>
     </div>
@@ -854,12 +854,12 @@
     <div class="group">
       <div class="group-title">{{_("Grid")}}</div>
       <div class="wizard-solved-params" id="review-grid-params">
-        <div class="wizard-solved-param"><span class="param-label">Width</span><span class="param-value" id="review-grid-width">-</span></div>
-        <div class="wizard-solved-param"><span class="param-label">Depth</span><span class="param-value" id="review-grid-depth">-</span></div>
-        <div class="wizard-solved-param"><span class="param-label">Spacing</span><span class="param-value" id="review-grid-spacing">-</span></div>
-        <div class="wizard-solved-param"><span class="param-label">X Offset</span><span class="param-value" id="review-grid-x-offset">-</span></div>
-        <div class="wizard-solved-param"><span class="param-label">Y Offset</span><span class="param-value" id="review-grid-y-offset">-</span></div>
-        <div class="wizard-solved-param"><span class="param-label">Z Offset</span><span class="param-value" id="review-grid-z-offset">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('Width')}}</span><span class="param-value" id="review-grid-width">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('Depth')}}</span><span class="param-value" id="review-grid-depth">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('Spacing')}}</span><span class="param-value" id="review-grid-spacing">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('X Offset')}}</span><span class="param-value" id="review-grid-x-offset">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('Y Offset')}}</span><span class="param-value" id="review-grid-y-offset">-</span></div>
+        <div class="wizard-solved-param"><span class="param-label">{{_('Z Offset')}}</span><span class="param-value" id="review-grid-z-offset">-</span></div>
       </div>
     </div>
 

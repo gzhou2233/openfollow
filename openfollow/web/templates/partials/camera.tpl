@@ -32,7 +32,7 @@
                        aria-describedby="camera-pos-y-error" aria-invalid="false">
                 <span id="camera-pos-y-error" class="field-error"></span>
                 % if _imp:
-                <small class="metric-echo">Stored: {{metric_echo(config.camera.pos_y)}}</small>
+                <small class="metric-echo">{{_('Stored:')}} {{metric_echo(config.camera.pos_y)}}</small>
                 % end
             </div>
             <div class="field">
@@ -43,7 +43,7 @@
                        aria-describedby="camera-pos-z-error" aria-invalid="false">
                 <span id="camera-pos-z-error" class="field-error"></span>
                 % if _imp:
-                <small class="metric-echo">Stored: {{metric_echo(config.camera.pos_z)}}</small>
+                <small class="metric-echo">{{_('Stored:')}} {{metric_echo(config.camera.pos_z)}}</small>
                 % end
             </div>
         </div>
@@ -121,30 +121,30 @@
     </div>
 
     <div class="group experimental-feature">
-        <h3 class="group-title">Lens distortion <span class="badge-experimental">Experimental</span></h3>
-        <p class="field-note">Overlay-only curvature to match a fisheye / wide-angle lens; the video is never warped.</p>
+        <h3 class="group-title">{{_('Lens distortion')}} <span class="badge-experimental">{{_('Experimental')}}</span></h3>
+        <p class="field-note">{{_('Overlay-only curvature to match a fisheye / wide-angle lens; the video is never warped.')}}</p>
         <div class="row">
             <div class="field">
-                <label>Barrel / fisheye (k1)</label>
+                <label>{{_('Barrel / fisheye (k1)')}}</label>
                 <input type="number" id="camera-lens-k1" name="lens_k1" value="{{config.camera.lens_k1}}" min="-0.4" max="0.4" step="0.005"
                        oninput="var s=document.getElementById('camera-lens-k1-range'); if (s) s.value=this.value;"
                        hx-get="/api/validate/camera/lens_k1" hx-trigger="blur changed delay:200ms"
                        hx-target="#camera-lens-k1-error" hx-swap="innerHTML" hx-include="closest form"
                        aria-describedby="camera-lens-k1-error" aria-invalid="false">
                 <input type="range" id="camera-lens-k1-range" min="-0.4" max="0.4" step="0.005" value="{{config.camera.lens_k1}}"
-                       aria-label="Barrel / fisheye (k1) slider"
+                       aria-label="{{_('Barrel / fisheye (k1) slider')}}"
                        oninput="var n=document.getElementById('camera-lens-k1'); n.value=this.value;">
                 <span id="camera-lens-k1-error" class="field-error"></span>
             </div>
             <div class="field">
-                <label>Edge fit (k2)</label>
+                <label>{{_('Edge fit (k2)')}}</label>
                 <input type="number" id="camera-lens-k2" name="lens_k2" value="{{config.camera.lens_k2}}" min="-0.2" max="0.2" step="0.005"
                        oninput="var s=document.getElementById('camera-lens-k2-range'); if (s) s.value=this.value;"
                        hx-get="/api/validate/camera/lens_k2" hx-trigger="blur changed delay:200ms"
                        hx-target="#camera-lens-k2-error" hx-swap="innerHTML" hx-include="closest form"
                        aria-describedby="camera-lens-k2-error" aria-invalid="false">
                 <input type="range" id="camera-lens-k2-range" min="-0.2" max="0.2" step="0.005" value="{{config.camera.lens_k2}}"
-                       aria-label="Edge fit (k2) slider"
+                       aria-label="{{_('Edge fit (k2) slider')}}"
                        oninput="var n=document.getElementById('camera-lens-k2'); n.value=this.value;">
                 <span id="camera-lens-k2-error" class="field-error"></span>
             </div>

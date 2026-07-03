@@ -3,13 +3,13 @@
 """Static test pattern input plugin with grey and stage modes."""
 
 from __future__ import annotations
-from openfollow.i18n import _, _l  # noqa: E402
 
 import logging
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+from openfollow.i18n import _, _l  # noqa: E402
 from openfollow.video.inputs._base import (
     ConfigField,
     InputCapabilities,
@@ -211,11 +211,15 @@ class TestPatternInput(VideoInputBase):
             for key, (w, h) in _RESOLUTIONS.items()
         )
 
+        help_text = _(
+            "Static test image – useful for debugging overlay, Operator Screen, and detection without a live source."
+        )
+
         return (
             '<div class="row">'
             '    <div class="field wide">'
             '        <p style="margin:0 0 0.5rem 0;color:var(--text-muted,#888);">'
-            f"            {_('Static test image – useful for debugging overlay, Operator Screen, and detection without a live source.')}"
+            f"            {help_text}"
             "        </p>"
             "    </div>"
             "</div>"

@@ -38,13 +38,13 @@
 % end
 <div id="osc-bindings-section" class="section {{'saved' if defined('saved') and saved else ''}}" data-fold-key="osc_bindings" data-help="osc_bindings">
  <div class="section-head">
- <h2>{{_('OSC Output')}}</h2>
+ <h2>{{_('OSC Transmitters')}}</h2>
  <span class="section-note">{{_('Outbound OSC messages – Stream / Hotkey / Controller-button triggers')}}</span>
  </div>
 
  <div class="osc-bindings-list">
  % if not transmitters:
- <p class="empty-state">{{_('No OSC outputs configured. Use')}} <em>{{_('+ New OSC output')}}</em> {{_('below to create one.')}}</p>
+ <p class="empty-state">{{_('No transmitters configured. Use')}} <em>{{_('+ New transmitter')}}</em> {{_('below to create one.')}}</p>
  % end
  % for idx, row in enumerate(transmitters):
  % is_focus = (defined('focus_id') and focus_id == row.id)
@@ -91,7 +91,7 @@
  % if _marker_header:
  <span class="osc-binding-marker-badge">{{_marker_header}}</span>
  % end
- <span class="osc-binding-target">{{_dest_label(row.destination_id)}}</span> (i18n: refine _() wrapping - remove from internals, add missing user-facing strings)
+ <span class="osc-binding-target">{{_dest_label(row.destination_id)}}</span>
  </summary>
 
  <form class="osc-binding-form"
@@ -139,15 +139,16 @@
  <input type="text" name="name" value="{{row.name}}" maxlength="64">
  </div>
  <div class="field">
- % # Default marker now optional. No min="0" (avoids
- % # stepper vs empty value). Render empty when None.
- % # Wire to validate endpoint; blur surfaces error
- % # if default-marker placeholder has no satisfying
- % # marker. hx-include pulls hidden osc_message for
- % # cross-field check.
- <label for="marker-id-{{row.id}}">{{_('Default marker')}}</label>
- <input id="marker-id-{{row.id}}" type="number" name="marker_id" value="{{'' if row.marker_id is None else row.marker_id}}" step="1" placeholder="{{_('(none)')}}"
- hx-get="/api/validate/osc_binding/marker_id" (i18n-final: all 39 templates wrapped, 630 PO entries, zero nest zero syntax error)
+ % # Default markers: comma-separated ids / controller
+ % # aliases (cN) / ``all``. Multiple markers fan the row
+ % # out into one independent send each. Blur validates
+ % # token syntax + surfaces the cross-field "uses [x] but
+ % # names no usable default marker" warning; hx-include
+ % # pulls the hidden osc_message for that check.
+ <label for="markers-{{row.id}}">{{_('Default markers')}}</label>
+ <input id="markers-{{row.id}}" type="text" name="markers" value="{{', '.join(row.markers)}}" placeholder="{{_('(none)')}}"
+ maxlength="256"
+ hx-get="/api/validate/osc_binding/markers"
  hx-trigger="blur changed delay:200ms"
  hx-target="#markers-{{row.id}}-error"
  hx-swap="innerHTML"
@@ -202,7 +203,7 @@
  <option value="{{d.id}}" {{'selected' if d.id == row.destination_id else ''}}>{{d.name or _('(unnamed)')}} – {{d.protocol}}://{{d.host}}:{{d.port}}</option>
  % end
  </select>
- <span id="destination-id-{{row.id}}-error" class="field-error"></span> (i18n: refine _() wrapping - remove from internals, add missing user-facing strings)
+ <span id="destination-id-{{row.id}}-error" class="field-error"></span>
  </div>
  </div>
  </div>
@@ -423,7 +424,7 @@
  hx-post="/section/osc_binding/{{row.id}}/delete"
  hx-target="#osc-bindings-section"
  hx-swap="outerHTML"
- hx-confirm="{{_('Delete this OSC output?')}}">{{_('Delete')}}</button>
+ hx-confirm="{{_('Delete this transmitter?')}}">{{_('Delete')}}</button>
  </div>
  </form>
  </details>
@@ -433,7 +434,7 @@
  % # Each carries the same status dot as a transmitter row: red when the id
  % # isn't controlled by this station (its send is dropped at runtime).
  % if _marker_nested:
- <div class="osc-binding-nested" aria-label="Additional markers">
+ <div class="osc-binding-nested" aria-label="{{_('Additional markers')}}">
  % for _entry in _marker_nested:
  <span class="osc-binding-nested-row{{'' if _entry['controlled'] else ' is-invalid'}}"{{!'' if _entry['controlled'] else ' title=\"Not controlled by this station (ignored)\"'}}>
  <span class="osc-binding-enabled-dot {{'on' if _entry['controlled'] else 'invalid'}}" aria-label="{{'Controlled' if _entry['controlled'] else 'Not controlled'}}"></span>
@@ -481,6 +482,6 @@
  </optgroup>
  % end
  </select>
- <button type="submit" class="save-btn">{{_('+ New OSC output')}}</button>
+ <button type="submit" class="save-btn">{{_('+ New transmitter')}}</button>
  </form>
 </div>

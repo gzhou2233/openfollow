@@ -39,6 +39,7 @@ _EN_ONLY = ("en",)
 
 # ── _template_translate ─────────────────────────────────────────────────────
 
+
 class TestTemplateTranslate:
     """The bridge function that SimpleTemplate.defaults["_"] points to."""
 
@@ -52,6 +53,7 @@ class TestTemplateTranslate:
 
 
 # ── _LazyString ─────────────────────────────────────────────────────────────
+
 
 class TestLazyString:
     """Deferred translation strings: declare at import time, resolve at request time."""
@@ -116,8 +118,43 @@ class TestLazyString:
         ls = _LazyString("B")
         assert "A" + ls == "AB"
 
+    def test_str_methods_forwarded(self) -> None:
+        """Transparent str proxy: ``.lower()`` etc. resolve then delegate.
+
+        Plugin ``display_name`` is declared ``_l(...)`` but consumed as a
+        plain ``str`` (e.g. sorted by ``display_name.lower()`` in
+        ``app_modes``).  Without method forwarding that path raised
+        ``AttributeError: '_LazyString' object has no attribute 'lower'``.
+        """
+        i18n._translate_ctx.set(None)
+        ls = _LazyString("USB Camera")
+        assert ls.lower() == "usb camera"
+        assert ls.upper() == "USB CAMERA"
+        assert ls.strip() == "USB Camera"
+        assert ls.split() == ["USB", "Camera"]
+        assert ls.replace("USB", "Pi") == "Pi Camera"
+
+    def test_len_index_contains_iter(self) -> None:
+        i18n._translate_ctx.set(None)
+        ls = _LazyString("abc")
+        assert len(ls) == 3
+        assert ls[0] == "a"
+        assert "b" in ls
+        assert list(ls) == ["a", "b", "c"]
+
+    def test_sortable_by_lower_like_display_name(self) -> None:
+        """Regression: source-type list is sorted by ``display_name.lower()``."""
+        i18n._translate_ctx.set(None)
+        names = [_LazyString("Zeta"), _LazyString("alpha"), _LazyString("Mid")]
+        assert [str(n) for n in sorted(names, key=lambda s: s.lower())] == [
+            "alpha",
+            "Mid",
+            "Zeta",
+        ]
+
 
 # ── lazy_gettext / _l ──────────────────────────────────────────────────────
+
 
 def test_lazy_gettext_returns_lazy_string() -> None:
     result = lazy_gettext("Test")
@@ -131,9 +168,11 @@ def test_l_alias_is_lazy_gettext() -> None:
 
 # ── _() immediate translation ──────────────────────────────────────────────
 
+
 def test_immediate_underscore_translates() -> None:
     i18n._translate_ctx.set(lambda s: s.upper())
     assert _("hello") == "HELLO"
+
 
 def test_immediate_underscore_no_translator() -> None:
     i18n._translate_ctx.set(None)
@@ -141,6 +180,7 @@ def test_immediate_underscore_no_translator() -> None:
 
 
 # ── _subtag_match ───────────────────────────────────────────────────────────
+
 
 class TestSubtagMatch:
     """RFC 5646 boundary-safe language tag prefix matching."""
@@ -150,17 +190,17 @@ class TestSubtagMatch:
         assert _subtag_match("zh_tw", "zh_tw") is True
 
     def test_primary_subtag_match(self) -> None:
-        """"en_US" matches "en" because "en" is the primary subtag."""
+        """ "en_US" matches "en" because "en" is the primary subtag."""
         assert _subtag_match("en_us", "en") is True
         assert _subtag_match("zh_tw", "zh") is True
 
     def test_requested_longer_than_available(self) -> None:
-        """"en" matches "en_US" — browser wants specific, we have generic."""
+        """ "en" matches "en_US" — browser wants specific, we have generic."""
         assert _subtag_match("en", "en_us") is True
         assert _subtag_match("zh", "zh_tw") is True
 
     def test_no_boundary_no_match(self) -> None:
-        """"english" should NOT match "en" — no subtag boundary at position 2."""
+        """ "english" should NOT match "en" — no subtag boundary at position 2."""
         assert _subtag_match("english", "en") is False
         assert _subtag_match("ende", "en") is False
 
@@ -171,12 +211,14 @@ class TestSubtagMatch:
 
 # ── _AVAILABLE_LANGUAGES ───────────────────────────────────────────────────
 
+
 def test_available_languages_empty_by_default() -> None:
     """Empty tuple means auto-discover; set to non-empty to override."""
     assert _AVAILABLE_LANGUAGES == ()
 
 
 # ── _discover_languages ────────────────────────────────────────────────────
+
 
 class TestDiscoverLanguages:
     """Locale auto-discovery: drop a .mo, restart, and it Just Works."""
@@ -222,6 +264,7 @@ class TestDiscoverLanguages:
 
 
 # ── _best_language ─────────────────────────────────────────────────────────
+
 
 class TestBestLanguage:
     """Accept-Language header negotiation."""
@@ -301,6 +344,7 @@ class TestBestLanguage:
 
 # ── I18NPlugin ──────────────────────────────────────────────────────────────
 
+
 class TestI18NPlugin:
     """Bottle plugin lifecycle: setup, per-request apply, close."""
 
@@ -370,6 +414,7 @@ class TestI18NPlugin:
     def test_setup_logs_translation_errors(self, caplog: Any, tmp_path: Path) -> None:
         """When gettext raises (e.g. permission error), log a warning."""
         import logging
+
         saved = i18n._LOCALE_ROOT
         try:
             i18n._LOCALE_ROOT = tmp_path / "nonexistent"
@@ -407,8 +452,10 @@ class TestI18NPlugin:
         app = Bottle()
         p1 = I18NPlugin(domain="nonexistent")
         p1.setup(app)
+
         def fake_translator(s: str) -> str:
             return s
+
         SimpleTemplate.defaults["_"] = fake_translator
         p1.close()
         assert SimpleTemplate.defaults["_"] is fake_translator
@@ -427,6 +474,7 @@ class TestI18NPlugin:
 
 
 # ── Integration: Bottle app with I18NPlugin ─────────────────────────────────
+
 
 class TestBottleIntegration:
     """End-to-end: Bottle app with i18n plugin serving templates."""
@@ -488,6 +536,7 @@ class TestBottleIntegration:
 
 # ── Thread safety ──────────────────────────────────────────────────────────
 
+
 def test_thread_local_isolation() -> None:
     """Each thread gets its own translator via ContextVar."""
     i18n._translate_ctx.set(None)
@@ -497,10 +546,7 @@ def test_thread_local_isolation() -> None:
         i18n._translate_ctx.set(lambda s: f"[{prefix}]{s}")
         results[thread_id] = _template_translate("test")
 
-    threads = [
-        threading.Thread(target=worker, args=(i, f"T{i}"))
-        for i in range(4)
-    ]
+    threads = [threading.Thread(target=worker, args=(i, f"T{i}")) for i in range(4)]
     for t in threads:
         t.start()
     for t in threads:
@@ -511,6 +557,7 @@ def test_thread_local_isolation() -> None:
 
 
 # ── Template rendering ────────────────────────────────────────────────────
+
 
 def test_template_translate_without_plugin() -> None:
     """SimpleTemplate._() works once the bridge is wired manually."""
@@ -528,8 +575,6 @@ def test_template_translate_with_custom_translator() -> None:
     assert tpl.render() == "LOUD"
 
 
-
-
 # ═══════════════════════════════════════════════════════════════════════════
 #  Cookie behaviour
 # ═══════════════════════════════════════════════════════════════════════════
@@ -540,14 +585,25 @@ class TestCookieBehaviour:
     """Tests for cookie-related i18n behaviour."""
 
     @staticmethod
-    def _bottle_request(app: Bottle, path: str = "/", environ_overrides: dict[str, Any] | None = None) -> tuple[bytes, dict[str, str]]:
+    def _bottle_request(
+        app: Bottle,
+        path: str = "/",
+        environ_overrides: dict[str, Any] | None = None,
+    ) -> tuple[bytes, dict[str, str]]:
         environ: dict[str, Any] = {
-            "REQUEST_METHOD": "GET", "PATH_INFO": path, "SCRIPT_NAME": "",
-            "SERVER_NAME": "localhost", "SERVER_PORT": "8080",
-            "SERVER_PROTOCOL": "HTTP/1.1", "HTTP_HOST": "test",
-            "wsgi.version": (1, 0), "wsgi.url_scheme": "http",
-            "wsgi.input": io.BytesIO(), "wsgi.errors": io.StringIO(),
-            "wsgi.multithread": False, "wsgi.multiprocess": False,
+            "REQUEST_METHOD": "GET",
+            "PATH_INFO": path,
+            "SCRIPT_NAME": "",
+            "SERVER_NAME": "localhost",
+            "SERVER_PORT": "8080",
+            "SERVER_PROTOCOL": "HTTP/1.1",
+            "HTTP_HOST": "test",
+            "wsgi.version": (1, 0),
+            "wsgi.url_scheme": "http",
+            "wsgi.input": io.BytesIO(),
+            "wsgi.errors": io.StringIO(),
+            "wsgi.multithread": False,
+            "wsgi.multiprocess": False,
             "wsgi.run_once": False,
         }
         if environ_overrides:
@@ -559,7 +615,6 @@ class TestCookieBehaviour:
             captured.update(dict(headers))
 
         return b"".join(app.wsgi(environ, start_response)), captured
-
 
     def test_first_visit_no_cookie(self) -> None:
         """First visit sets a lang cookie (no pre-existing cookie)."""
@@ -686,6 +741,7 @@ class TestSetLangRoute:
     @staticmethod
     def _make_set_lang_app(available: tuple[str, ...] = ("en", "zh_CN")) -> Bottle:
         from urllib.parse import urlparse
+
         from bottle import HTTPResponse, request
 
         plugin = I18NPlugin(domain="openfollow")
@@ -709,13 +765,17 @@ class TestSetLangRoute:
             # falls back to inline check for testing against older installed pkg.
             try:
                 from openfollow.i18n import validate_language_code  # noqa: F811
+
                 if not validate_language_code(lang):
                     from bottle import abort as _abort
+
                     _abort(404)
             except ImportError:
                 from openfollow.i18n import _AVAILABLE_LANGUAGES
+
                 if lang != "en" and lang not in _AVAILABLE_LANGUAGES:
                     from bottle import abort as _abort
+
                     _abort(404)
             target = "/"
             referer = request.headers.get("Referer")
@@ -730,6 +790,7 @@ class TestSetLangRoute:
             # Reuse the same cookie policy as I18NPlugin.apply().
             try:
                 from openfollow.i18n import _COOKIE_OPTS
+
                 cookie_opts = dict(_COOKIE_OPTS)
             except ImportError:
                 cookie_opts = {"path": "/", "max_age": 86400 * 365}
@@ -742,12 +803,19 @@ class TestSetLangRoute:
     @staticmethod
     def _request(app: Bottle, path: str, **extra: Any) -> tuple[bytes, dict[str, str]]:
         environ: dict[str, Any] = {
-            "REQUEST_METHOD": "GET", "PATH_INFO": path, "SCRIPT_NAME": "",
-            "SERVER_NAME": "localhost", "SERVER_PORT": "8080",
-            "SERVER_PROTOCOL": "HTTP/1.1", "HTTP_HOST": "test",
-            "wsgi.version": (1, 0), "wsgi.url_scheme": "http",
-            "wsgi.input": io.BytesIO(), "wsgi.errors": io.StringIO(),
-            "wsgi.multithread": False, "wsgi.multiprocess": False,
+            "REQUEST_METHOD": "GET",
+            "PATH_INFO": path,
+            "SCRIPT_NAME": "",
+            "SERVER_NAME": "localhost",
+            "SERVER_PORT": "8080",
+            "SERVER_PROTOCOL": "HTTP/1.1",
+            "HTTP_HOST": "test",
+            "wsgi.version": (1, 0),
+            "wsgi.url_scheme": "http",
+            "wsgi.input": io.BytesIO(),
+            "wsgi.errors": io.StringIO(),
+            "wsgi.multithread": False,
+            "wsgi.multiprocess": False,
             "wsgi.run_once": False,
         }
         environ.update(extra)
@@ -850,7 +918,7 @@ class TestValidateLanguageCode:
 @pytest.mark.unit
 def test_underscore_double_quotes_for_apostrophes() -> None:
     """Template strings with apostrophes should use double quotes in _().
-    
+
     Double quotes ("...") work around single-quote delimiter issues.
     """
     SimpleTemplate.defaults["_"] = _template_translate

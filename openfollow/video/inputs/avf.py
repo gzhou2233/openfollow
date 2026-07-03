@@ -8,13 +8,13 @@ order changes don't break the selection. macOS-only via ``is_available()``.
 """
 
 from __future__ import annotations
-from openfollow.i18n import _, _l  # noqa: E402
 
 import logging
 import sys
 from collections.abc import Callable
 from typing import Any
 
+from openfollow.i18n import _, _l  # noqa: E402
 from openfollow.video.inputs._base import (
     ConfigField,
     InputCapabilities,
@@ -286,7 +286,7 @@ class AvfInput(VideoInputBase):
         return (
             '<div class="row ndi-row">'
             '    <div class="field wide">'
-            f"        <label>{_("Device")}</label>"
+            f"        <label>{_('Device')}</label>"
             '        <select name="avf_unique_id"'
             '                hx-get="/video-input/avf/devices"'
             '                hx-trigger="load, click from:'
@@ -307,20 +307,20 @@ class AvfInput(VideoInputBase):
             "</div>"
             '<div class="row">'
             '    <div class="field">'
-            f"        <label>{_("Width")}</label>"
+            f"        <label>{_('Width')}</label>"
             '        <input type="number"'
             f'               name="avf_width" value="{width}"'
             '                min="160" max="3840">'
             "    </div>"
             '    <div class="field">'
-            f"        <label>{_("Height")}</label>"
+            f"        <label>{_('Height')}</label>"
             '        <input type="number"'
             f'               name="avf_height"'
             f'               value="{height}"'
             '                min="120" max="2160">'
             "    </div>"
             '    <div class="field">'
-            f"        <label>{_("FPS")}</label>"
+            f"        <label>{_('FPS')}</label>"
             '        <input type="number"'
             f'               name="avf_framerate"'
             f'               value="{framerate}"'

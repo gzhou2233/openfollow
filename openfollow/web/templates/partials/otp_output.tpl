@@ -22,7 +22,7 @@
             </div>
             <div class="field">
                 <label>{{_('Multicast addresses')}}</label>
-                <div class="readonly-display" aria-label="Computed OTP multicast addresses">
+                <div class="readonly-display" aria-label="{{_('Computed OTP multicast addresses')}}">
                     <div><strong>{{_('Transform:')}}</strong> {{config.otp_output.transform_mcast_ip}}</div>
                     <div><strong>{{_('Advertisement:')}}</strong> {{config.otp_output.advertisement_mcast_ip}}</div>
                 </div>

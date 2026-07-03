@@ -43,8 +43,8 @@
         <div id="video-preview-wrap" style="display:none;">
             <div class="row">
                 <div class="field" style="min-width:100%;">
-                    <img id="video-preview" class="video-preview" alt="Video preview">
-                    <span id="video-preview-hint" class="video-preview-hint">No preview available – waiting for video source.</span>
+                    <img id="video-preview" class="video-preview" alt="{{_('Video preview')}}">
+                    <span id="video-preview-hint" class="video-preview-hint">{{_('No preview available – waiting for video source.')}}</span>
                 </div>
             </div>
         </div>

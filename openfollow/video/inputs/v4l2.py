@@ -3,7 +3,6 @@
 """V4L2 (USB camera / capture card) video input plugin."""
 
 from __future__ import annotations
-from openfollow.i18n import _, _l  # noqa: E402
 
 import glob
 import logging
@@ -13,6 +12,7 @@ import sys
 from collections.abc import Callable
 from typing import Any
 
+from openfollow.i18n import _, _l  # noqa: E402
 from openfollow.video.inputs._base import (
     ConfigField,
     InputCapabilities,
@@ -332,7 +332,7 @@ class V4l2Input(VideoInputBase):
         return (
             '<div class="row ndi-row">'
             '    <div class="field wide">'
-            f"        <label>{_("Device")}</label>"
+            f"        <label>{_('Device')}</label>"
             '        <select name="v4l2_device"'
             '                hx-get="/video-input/v4l2/devices"'
             '                hx-trigger="load, click from:'
@@ -351,13 +351,13 @@ class V4l2Input(VideoInputBase):
             "</div>"
             '<div class="row">'
             '    <div class="field">'
-            f"        <label>{_("Render resolution")}</label>"
+            f"        <label>{_('Render resolution')}</label>"
             '        <select name="v4l2_render_resolution">'
             f"            {render_options}"
             "        </select>"
             "    </div>"
             '    <div class="field">'
-            f"        <label>{_("FPS")}</label>"
+            f"        <label>{_('FPS')}</label>"
             '        <input type="number"'
             f'               name="v4l2_framerate"'
             f'               value="{framerate}"'
