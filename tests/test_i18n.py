@@ -684,6 +684,25 @@ def test_available_languages_in_template_defaults() -> None:
 
 
 @pytest.mark.unit
+def test_available_languages_default_before_plugin_setup() -> None:
+    """A template using the lang-switch renders before I18NPlugin.setup().
+
+    Mirrors ``test_template_translate_without_plugin`` for ``_``: the import
+    time ``setdefault("available_languages", ())`` must keep a switcher-bearing
+    template from raising ``NameError`` when rendered pre-setup (tests, CLI,
+    wizard), with the switcher hidden.  Regression guard for the bug the
+    ``defaults`` leak used to mask.
+    """
+    # Import-time fallback guarantees the key exists; force the empty (no
+    # languages discovered) case so the assertion does not depend on whatever
+    # a prior test in the process may have left in the shared defaults.
+    SimpleTemplate.defaults["available_languages"] = ()
+    # A switcher-bearing template must render without NameError, hidden.
+    tpl = SimpleTemplate("% if len(available_languages) > 1:\nSWITCH\n% end\nok")
+    assert tpl.render().strip() == "ok"
+
+
+@pytest.mark.unit
 def test_lang_switch_hidden_single_language() -> None:
     """len(available_languages)==1 → template hides lang-switch."""
     plugin = I18NPlugin(domain="openfollow")

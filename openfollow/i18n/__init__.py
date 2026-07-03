@@ -46,6 +46,11 @@ logger = logging.getLogger(__name__)
 # causes a NameError. The plugin's setup() overwrites it with the real
 # per-request translator.
 SimpleTemplate.defaults.setdefault("_", lambda x: x)
+# Same guard for the language switcher in ``base.tpl`` (``% if
+# len(available_languages) > 1``).  The plugin's setup() overwrites this with
+# the discovered ``.mo`` languages; the empty default keeps the switcher hidden
+# and avoids a NameError when a template is rendered before setup (tests, CLI).
+SimpleTemplate.defaults.setdefault("available_languages", ())
 
 # Locale catalogues live at the repository root under ``locale/<lang>/…``.
 # The path is resolved relative to *this module* (three levels up:
