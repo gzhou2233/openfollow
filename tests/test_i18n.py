@@ -33,6 +33,31 @@ from openfollow.i18n import (
 
 pytestmark = pytest.mark.unit
 
+
+@pytest.fixture(autouse=True)
+def _restore_template_defaults() -> Any:
+    """Snapshot and restore process-global i18n state around every test.
+
+    ``I18NPlugin.setup()`` writes ``_`` and ``available_languages`` into the
+    class-level ``SimpleTemplate.defaults`` (and mutates the module-level
+    ``_AVAILABLE_LANGUAGES`` cache).  Bottle resolves those names live from
+    ``defaults`` at render time, so a ``setup()`` in one test otherwise leaks
+    into every later test in the process.  That leak previously *masked* a real
+    bug (``base.tpl`` referencing ``available_languages`` with no pre-setup
+    fallback): the suite passed serially only because ``test_i18n`` runs before
+    ``test_web_picker_wiring`` and seeded ``defaults`` first.  Isolating the
+    state here keeps that class of bug visible.
+    """
+    saved_defaults = SimpleTemplate.defaults.copy()
+    saved_available = i18n._AVAILABLE_LANGUAGES
+    try:
+        yield
+    finally:
+        SimpleTemplate.defaults.clear()
+        SimpleTemplate.defaults.update(saved_defaults)
+        i18n._AVAILABLE_LANGUAGES = saved_available
+
+
 # Default available languages used in _best_language tests.
 _EN_ONLY = ("en",)
 
@@ -72,6 +97,13 @@ class TestLazyString:
         i18n._translate_ctx.set(None)
         ls = _LazyString("Hello")
         assert repr(ls) == "'Hello'"
+
+    def test_eq_with_non_string_returns_notimplemented(self) -> None:
+        # Comparing to a non-str, non-_LazyString yields NotImplemented so
+        # Python falls back to identity (they are unequal, and don't raise).
+        ls = lazy_gettext("x")
+        assert ls.__eq__(42) is NotImplemented
+        assert ls != 42
 
     def test_eq_by_msgid(self) -> None:
         a = _LazyString("foo")
@@ -315,6 +347,22 @@ class TestBestLanguage:
     def test_q_clamped_to_range(self) -> None:
         """q values outside 0.0–1.0 are clamped."""
         assert _best_language("en;q=0.5, fr;q=999", _EN_ONLY) == "en"
+
+    def test_malformed_q_value_falls_back_to_default(self) -> None:
+        """A non-numeric ``q`` (e.g. ``q=abc``) must not crash: it is treated
+        as the default quality (1.0) instead of raising ValueError."""
+        assert _best_language("en;q=abc", _EN_ONLY) == "en"
+        # zh_CN with a garbage q still wins over a lower-ranked en.
+        assert _best_language("zh_CN;q=abc, en;q=0.1", ("en", "zh_CN")) == "zh_CN"
+
+    def test_longest_subtag_match_wins(self) -> None:
+        """Among non-exact subtag matches the longest (most specific) available
+        tag is chosen, regardless of order."""
+        # Longer match first, then a shorter match: the shorter one must be
+        # rejected (exercises the loop's 'not longer' back-edge).
+        assert _best_language("zh", ("en", "zh_Hans_CN", "zh_CN")) == "zh_Hans_CN"
+        # Shorter first, then longer: the longer one replaces it.
+        assert _best_language("zh", ("en", "zh_CN", "zh_Hans_CN")) == "zh_Hans_CN"
 
     def test_fallback_respects_available_order(self) -> None:
         """When no match, returns available[0], not hardcoded 'en'."""
@@ -759,65 +807,23 @@ class TestSetLangRoute:
 
     @staticmethod
     def _make_set_lang_app(available: tuple[str, ...] = ("en", "zh_CN")) -> Bottle:
-        from urllib.parse import urlparse
+        """Return the *real* app with the real ``/set-lang`` route registered.
 
-        from bottle import HTTPResponse, request
+        Builds a ``ConfigWebServer`` (which calls ``routes.setup_routes`` and
+        installs ``I18NPlugin``) so these tests exercise ``routes.py`` itself,
+        not a copy.  ``_AVAILABLE_LANGUAGES`` / ``_discover_languages`` are
+        overridden so ``validate_language_code`` accepts ``available``; the
+        module-level state is restored by the autouse fixture in this file.
+        """
+        import tempfile
 
-        plugin = I18NPlugin(domain="openfollow")
-        app = Bottle()
-        app.config["use_https"] = False
-        original = i18n._discover_languages
-        try:
-            i18n._AVAILABLE_LANGUAGES = ()
-            i18n._discover_languages = lambda root, domain: available
-            plugin.setup(app)
-            # Sync back in case setup() is from a version that doesn't
-            # update the module-level variable (backward compat).
-            i18n._AVAILABLE_LANGUAGES = plugin._available_languages
-        finally:
-            i18n._discover_languages = original
+        from openfollow.web.server import ConfigWebServer
 
-        @app.get("/set-lang/<lang>")
-        def set_lang(lang: str):
-            # Mirror of the real set_lang in routes.py.
-            # Uses validate_language_code() when available (framework branch),
-            # falls back to inline check for testing against older installed pkg.
-            try:
-                from openfollow.i18n import validate_language_code  # noqa: F811
-
-                if not validate_language_code(lang):
-                    from bottle import abort as _abort
-
-                    _abort(404)
-            except ImportError:
-                from openfollow.i18n import _AVAILABLE_LANGUAGES
-
-                if lang != "en" and lang not in _AVAILABLE_LANGUAGES:
-                    from bottle import abort as _abort
-
-                    _abort(404)
-            target = "/"
-            referer = request.headers.get("Referer")
-            if referer:
-                parsed = urlparse(referer)
-                request_host = request.headers.get("Host", "")
-                if parsed.netloc == request_host:
-                    target = parsed.path
-                    if parsed.query:
-                        target += "?" + parsed.query
-            resp = HTTPResponse(status=303, headers={"Location": target})
-            # Reuse the same cookie policy as I18NPlugin.apply().
-            try:
-                from openfollow.i18n import _COOKIE_OPTS
-
-                cookie_opts = dict(_COOKIE_OPTS)
-            except ImportError:
-                cookie_opts = {"path": "/", "max_age": 86400 * 365}
-            cookie_opts["secure"] = request.urlparts.scheme == "https"
-            resp.set_cookie("lang", lang, **cookie_opts)
-            raise resp
-
-        return app
+        i18n._AVAILABLE_LANGUAGES = ()
+        i18n._discover_languages = lambda root, domain: available
+        tmp = tempfile.mkdtemp(prefix="setlang-test-")
+        server = ConfigWebServer(config_path=str(Path(tmp) / "config.toml"))
+        return server._app
 
     @staticmethod
     def _request(app: Bottle, path: str, **extra: Any) -> tuple[bytes, dict[str, str]]:
@@ -867,6 +873,13 @@ class TestSetLangRoute:
         _body, h = self._request(app, "/set-lang/zh_CN", HTTP_REFERER="http://test/config")
         assert h["Location"] == "/config"
 
+    def test_same_origin_referer_preserves_query(self) -> None:
+        # A same-origin Referer with a query string is preserved verbatim so
+        # the operator lands back on the exact tab/anchor they came from.
+        app = self._make_set_lang_app()
+        _body, h = self._request(app, "/set-lang/zh_CN", HTTP_REFERER="http://test/config?tab=osc")
+        assert h["Location"] == "/config?tab=osc"
+
     def test_ignores_cross_origin_referer(self) -> None:
         app = self._make_set_lang_app()
         _body, h = self._request(app, "/set-lang/zh_CN", HTTP_REFERER="http://evil.com/steal")
@@ -875,6 +888,14 @@ class TestSetLangRoute:
     def test_rejects_unknown_language(self) -> None:
         app = self._make_set_lang_app()
         _body, h = self._request(app, "/set-lang/../../etc")
+        assert "404" in h["status"]
+
+    def test_rejects_unavailable_language_in_handler(self) -> None:
+        # A route-matching but unavailable code reaches the handler and is
+        # rejected by validate_language_code() (unlike ``../../etc`` above,
+        # which the WSGI layer normalises away before routing).
+        app = self._make_set_lang_app(available=("en", "zh_CN"))
+        _body, h = self._request(app, "/set-lang/fr")
         assert "404" in h["status"]
 
     def test_en_always_allowed(self) -> None:
